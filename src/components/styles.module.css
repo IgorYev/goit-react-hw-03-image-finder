@@ -108,6 +108,7 @@ img {
   white-space: nowrap;
   clip-path: inset(50%);
   border: 0;
+  /*  */
 }
 
 .SearchForm-input {
