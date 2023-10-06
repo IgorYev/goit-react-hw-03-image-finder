@@ -2,9 +2,18 @@ import React from 'react';
 import styles from '../styles.module.css';
 
 class Searchbar extends React.Component {
+  state = {
+    query: '',
+  };
   handleSubmit = event => {
     event.preventDefault();
-    this.props.onSubmit();
+    const query = this.state.query.trim().toLowerCase();
+    if (!query) return;
+    this.props.onSubmit(query);
+  };
+
+  handleChange = event => {
+    this.setState({ query: event.target.value });
   };
 
   render() {
@@ -18,6 +27,7 @@ class Searchbar extends React.Component {
 
           <input
             className={styles['SearchForm-input']}
+            onChange={this.handleChange}
             type="text"
             autoComplete="off"
             autoFocus

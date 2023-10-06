@@ -1,10 +1,10 @@
 import React from 'react';
 import styles from '../styles.module.css';
 
-const Button = ({ onLoadMore, hasMore }) => {
+const Button = ({ onLoadMore }) => {
   return (
     <button type="button" className={styles.Button} onClick={onLoadMore}>
-      {hasMore ? 'Load more' : 'No more images'}
+      Load More
     </button>
   );
 };

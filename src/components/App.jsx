@@ -12,42 +12,32 @@ class App extends React.Component {
     images: [],
     query: '',
     page: 1,
-    hasMoreImages: true,
+    totalImages: 0,
     loading: false,
     showModal: false,
     selectedImage: '',
     alt: '',
   };
 
-  handleChange = event => {
-    this.setState({ query: event.target.value });
-  };
+  componentDidUpdate(_, prevState) {
+    const { query, page } = this.state;
+    if (query !== prevState.query || page !== prevState.page) {
+      fetchImages(query, page).then(data => {
+        this.setState(prevState => ({
+          images: [...prevState.images, ...data.hits],
+          totalImages: data.totalHits,
+        }));
+      });
+    }
+  }
 
-  handleSubmit = () => {
-    const { query } = this.state;
-
-    fetchImages(query, 1).then(images => {
-      this.setState({ images, page: 1, hasMoreImages: true });
-    });
+  handleSubmit = query => {
+    this.setState({ query, page: 1, images: [], totalImages: 0 });
   };
 
   handleLoadMore = () => {
-    const { query, page, images } = this.state;
-
-    fetchImages(query, page + 1).then(newImages => {
-      if (newImages.length > 0) {
-        const newImageIds = new Set(newImages.map(image => image.id));
-        const updatedImages = images
-          .filter(image => !newImageIds.has(image.id))
-          .concat(newImages);
-
-        this.setState(prevState => ({
-          images: updatedImages,
-          page: prevState.page + 1,
-        }));
-      } else {
-        this.setState({ hasMoreImages: false });
-      }
+    this.setState(prevState => {
+      return { page: prevState.page + 1 };
     });
   };
 
@@ -71,20 +61,16 @@ class App extends React.Component {
     const {
       images,
       query,
-      hasMoreImages,
       loading,
       showModal,
       selectedImage,
       alt,
+      totalImages,
     } = this.state;
 
     return (
       <div className={styles.App}>
-        <Searchbar
-          onSubmit={this.handleSubmit}
-          query={query}
-          onChange={this.handleChange}
-        />
+        <Searchbar onSubmit={this.handleSubmit} query={query} />
         {loading ? (
           <Audio
             height="100"
@@ -98,8 +84,8 @@ class App extends React.Component {
         ) : (
           <ImageGallery images={images} onClick={this.handleImageClick} />
         )}
-        {hasMoreImages && (
-          <Button onLoadMore={this.handleLoadMore} hasMore={hasMoreImages} />
+        {totalImages !== images.length && (
+          <Button onLoadMore={this.handleLoadMore} />
         )}
         {showModal && (
           <Modal

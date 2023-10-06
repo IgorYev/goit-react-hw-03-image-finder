@@ -17,7 +17,7 @@ export const fetchImages = (query, page = 1) => {
         orientation: 'horizontal',
       },
     })
-    .then(response => response.data.hits)
+    .then(response => response.data)
     .catch(error => {
       console.error('Помилка при отриманні даних:', error);
       return [];
