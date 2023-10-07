@@ -214,3 +214,22 @@ img {
 .Button:focus {
   background-color: #303f9f;
 }
+.Error {
+  color: #212121;
+  line-height: 24px;
+  font-style: normal;
+  font-weight: 500;
+  margin: 0 auto;
+}
+.LoaderContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.NoResults {
+  color: #212121;
+  line-height: 24px;
+  font-style: normal;
+  font-weight: 500;
+  margin: 0 auto;
+}

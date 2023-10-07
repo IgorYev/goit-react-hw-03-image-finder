@@ -17,17 +17,32 @@ class App extends React.Component {
     showModal: false,
     selectedImage: '',
     alt: '',
+    error: '',
   };
 
   componentDidUpdate(_, prevState) {
     const { query, page } = this.state;
     if (query !== prevState.query || page !== prevState.page) {
-      fetchImages(query, page).then(data => {
-        this.setState(prevState => ({
-          images: [...prevState.images, ...data.hits],
-          totalImages: data.totalHits,
-        }));
-      });
+      this.setState({ loading: true });
+      fetchImages(query, page)
+        .then(data => {
+          if (data.totalHits === 0) {
+            return;
+          }
+
+          this.setState(prevState => ({
+            images: [...prevState.images, ...data.hits],
+            totalImages: data.totalHits,
+          }));
+        })
+        .catch(() => {
+          this.setState({
+            error: 'An error occurred while processing the request',
+          });
+        })
+        .finally(() => {
+          this.setState({ loading: false });
+        });
     }
   }
 
@@ -66,27 +81,46 @@ class App extends React.Component {
       selectedImage,
       alt,
       totalImages,
+      error,
     } = this.state;
+
+    const noResultsMessage =
+      totalImages === 0 && query.trim() !== '' ? (
+        <p className={styles.NoResults}>
+          No results found for your query. 🙁 Please try again.
+        </p>
+      ) : null;
 
     return (
       <div className={styles.App}>
         <Searchbar onSubmit={this.handleSubmit} query={query} />
         {loading ? (
-          <Audio
-            height="100"
-            width="100"
-            color="#4fa94d"
-            ariaLabel="audio-loading"
-            wrapperStyle={{}}
-            wrapperClass="wrapper-class"
-            visible={true}
-          />
-        ) : (
+          <div className={styles.LoaderContainer}>
+            <Audio
+              height="100"
+              width="100"
+              color="#4fa94d"
+              ariaLabel="audio-loading"
+              wrapperStyle={{}}
+              wrapperClass="wrapper-class"
+              visible={true}
+            />
+          </div>
+        ) : null}
+
+        {error ? (
+          <p className={styles.Error}>
+            An error occurred while processing the request
+          </p>
+        ) : null}
+
+        {images.length > 0 && (
           <ImageGallery images={images} onClick={this.handleImageClick} />
         )}
         {totalImages !== images.length && (
           <Button onLoadMore={this.handleLoadMore} />
         )}
+
         {showModal && (
           <Modal
             largeImageURL={selectedImage}
@@ -94,6 +128,8 @@ class App extends React.Component {
             onClose={this.handleCloseModal}
           />
         )}
+
+        {noResultsMessage}
       </div>
     );
   }
