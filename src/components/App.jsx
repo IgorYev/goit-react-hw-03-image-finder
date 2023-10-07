@@ -85,7 +85,7 @@ class App extends React.Component {
     } = this.state;
 
     const noResultsMessage =
-      totalImages === 0 && query.trim() !== '' ? (
+      totalImages === 0 && query.trim() !== '' && !loading ? (
         <p className={styles.NoResults}>
           No results found for your query. 🙁 Please try again.
         </p>
